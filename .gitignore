@@ -1,0 +1,15 @@
+/target/
+/.project
+/.classpath
+/.settings
+.DS_Store
+*.db
+.babelrc
+.editorconfig
+.coveralls.yml
+.npmignore
+.eslintrc
+.travis.yml
+.eslintrc.json
+/src/main/resources/static/node_modules
+/src/main/resources/static/node_modules/*
