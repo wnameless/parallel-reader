@@ -15,6 +15,7 @@
  */
 package com.github.wnameless.common.io.reader.parallel;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -42,7 +43,7 @@ public class ParallelLineReader {
   }
 
   public <E> List<CompletableFuture<E>> parallelRead(
-      LineReaderFunction<E> lineReaderConsumer) {
+      LineReaderFunction<E> lineReaderConsumer) throws IOException {
     if (executor == null) {
       return LineReaderUtils.parallelLineReader(reader, maxLines,
           lineReaderConsumer);

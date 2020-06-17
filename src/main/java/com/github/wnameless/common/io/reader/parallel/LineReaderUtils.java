@@ -17,6 +17,7 @@ package com.github.wnameless.common.io.reader.parallel;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,16 +25,15 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Supplier;
 
-import lombok.SneakyThrows;
-import lombok.experimental.UtilityClass;
 import net.sf.rubycollect4j.util.WholeLineReader;
 
-@UtilityClass
-public class LineReaderUtils {
+public final class LineReaderUtils {
 
-  public <E> List<CompletableFuture<E>> parallelLineReader(
+  private LineReaderUtils() {}
+
+  public static <E> List<CompletableFuture<E>> parallelLineReader(
       Supplier<? extends Reader> reader, int maxLines,
-      LineReaderFunction<E> lineReaderConsumer) {
+      LineReaderFunction<E> lineReaderConsumer) throws IOException {
     List<CompletableFuture<E>> futures = new ArrayList<>();
 
     List<Long> skipPoints = getSkipPoints(reader.get(), maxLines);
@@ -51,9 +51,10 @@ public class LineReaderUtils {
     return futures;
   }
 
-  public <E> List<CompletableFuture<E>> parallelLineReader(
+  public static <E> List<CompletableFuture<E>> parallelLineReader(
       Supplier<? extends Reader> reader, int maxLines,
-      LineReaderFunction<E> lineReaderConsumer, Executor executor) {
+      LineReaderFunction<E> lineReaderConsumer, Executor executor)
+      throws IOException {
     List<CompletableFuture<E>> futures = new ArrayList<>();
 
     List<Long> skipPoints = getSkipPoints(reader.get(), maxLines);
@@ -71,8 +72,9 @@ public class LineReaderUtils {
     return futures;
   }
 
-  public <E> List<CompletableFuture<E>> parallelLineReader(File file,
-      int maxLines, LineReaderFunction<E> lineReaderConsumer) {
+  public static <E> List<CompletableFuture<E>> parallelLineReader(File file,
+      int maxLines, LineReaderFunction<E> lineReaderConsumer)
+      throws IOException {
     List<CompletableFuture<E>> futures = new ArrayList<>();
 
     List<Long> skipPoints = getPartitionPoints(file, maxLines);
@@ -90,9 +92,9 @@ public class LineReaderUtils {
     return futures;
   }
 
-  public <E> List<CompletableFuture<E>> parallelLineReader(File file,
-      int maxLines, LineReaderFunction<E> lineReaderConsumer,
-      Executor executor) {
+  public static <E> List<CompletableFuture<E>> parallelLineReader(File file,
+      int maxLines, LineReaderFunction<E> lineReaderConsumer, Executor executor)
+      throws IOException {
     List<CompletableFuture<E>> futures = new ArrayList<>();
 
     List<Long> skipPoints = getPartitionPoints(file, maxLines);
@@ -110,16 +112,18 @@ public class LineReaderUtils {
     return futures;
   }
 
-  public LineReader toLineReader(Reader reader, long skip, int maxLines) {
+  public static LineReader toLineReader(Reader reader, long skip,
+      int maxLines) {
     return new LineReader(reader, skip, maxLines);
   }
 
-  public LineReader toLineReader(File file, long position, int maxLines) {
+  public static LineReader toLineReader(File file, long position,
+      int maxLines) {
     return new LineReader(file, position, maxLines);
   }
 
-  @SneakyThrows
-  public List<Long> getSkipPoints(Reader reader, int maxLines) {
+  public static List<Long> getSkipPoints(Reader reader, int maxLines)
+      throws IOException {
     WholeLineReader wlr = new WholeLineReader(reader);
 
     // BufferedReader bufferedReader = new BufferedReader(reader);
@@ -146,8 +150,8 @@ public class LineReaderUtils {
     return skipPoints;
   }
 
-  @SneakyThrows
-  public List<Long> getPartitionPoints(File file, int maxLines) {
+  public static List<Long> getPartitionPoints(File file, int maxLines)
+      throws IOException {
     WholeLineReader wlr = new WholeLineReader(new FileReader(file));
 
     // BufferedReader bufferedReader = new BufferedReader(reader);

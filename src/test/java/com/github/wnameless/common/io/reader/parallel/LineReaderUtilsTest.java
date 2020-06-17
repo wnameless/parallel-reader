@@ -20,11 +20,13 @@ import static org.junit.Assert.assertEquals;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.Reader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
@@ -34,7 +36,7 @@ import net.sf.rubycollect4j.Ruby;
 public class LineReaderUtilsTest {
 
   @Test
-  public void testgGetSkipPoints() throws FileNotFoundException {
+  public void testgGetSkipPoints() throws IOException {
     List<Long> skipPoints = LineReaderUtils
         .getSkipPoints(new FileReader("src/test/resources/test.csv"), 1);
 
@@ -45,7 +47,7 @@ public class LineReaderUtilsTest {
 
   @Test
   public void testParallelLineReader()
-      throws InterruptedException, ExecutionException {
+      throws InterruptedException, ExecutionException, IOException {
     Supplier<Reader> reader = () -> {
       try {
         return new FileReader("src/test/resources/test.csv");
@@ -75,8 +77,39 @@ public class LineReaderUtilsTest {
   }
 
   @Test
+  public void testParallelLineReaderWithExecutor()
+      throws InterruptedException, ExecutionException, IOException {
+    Supplier<Reader> reader = () -> {
+      try {
+        return new FileReader("src/test/resources/test.csv");
+      } catch (FileNotFoundException e) {}
+      return null;
+    };
+
+    List<CompletableFuture<String>> futures =
+        LineReaderUtils.parallelLineReader(reader, 2, (part, lr) -> {
+          String str = "";
+
+          while (lr.hasNext()) {
+            str += lr.readLineQuietly();
+          }
+
+          return str;
+        }, Executors.newFixedThreadPool(4));
+
+    while (!Ruby.Array.of(futures).map(f -> f.isDone()).allʔ()) {}
+
+    String res = "";
+    for (CompletableFuture<String> cf : futures) {
+      res += cf.get();
+    }
+
+    assertEquals("1234567891011", res);
+  }
+
+  @Test
   public void testParallelLineReaderWithFile()
-      throws InterruptedException, ExecutionException {
+      throws InterruptedException, ExecutionException, IOException {
     List<CompletableFuture<String>> futures =
         LineReaderUtils.parallelLineReader(
             new File("src/test/resources/test.csv"), 2, (part, lr) -> {
@@ -88,6 +121,31 @@ public class LineReaderUtilsTest {
 
               return str;
             });
+
+    while (!Ruby.Array.of(futures).map(f -> f.isDone()).allʔ()) {}
+
+    String res = "";
+    for (CompletableFuture<String> cf : futures) {
+      res += cf.get();
+    }
+
+    assertEquals("1234567891011", res);
+  }
+
+  @Test
+  public void testParallelLineReaderWithFileAndExecutor()
+      throws InterruptedException, ExecutionException, IOException {
+    List<CompletableFuture<String>> futures =
+        LineReaderUtils.parallelLineReader(
+            new File("src/test/resources/test.csv"), 2, (part, lr) -> {
+              String str = "";
+
+              while (lr.hasNext()) {
+                str += lr.readLineQuietly();
+              }
+
+              return str;
+            }, Executors.newFixedThreadPool(4));
 
     while (!Ruby.Array.of(futures).map(f -> f.isDone()).allʔ()) {}
 

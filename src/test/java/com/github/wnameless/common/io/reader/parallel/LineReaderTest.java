@@ -16,14 +16,11 @@
 package com.github.wnameless.common.io.reader.parallel;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -38,6 +35,7 @@ public class LineReaderTest {
     while (lr.hasNext()) {
       res += lr.readLine();
     }
+    assertNull(lr.readLine());
     lr.close();
 
     assertEquals("12", res);
@@ -52,40 +50,10 @@ public class LineReaderTest {
     while (lr.hasNext()) {
       res += lr.readLine();
     }
+    assertNull(lr.readLine());
     lr.close();
 
     assertEquals("12", res);
-  }
-
-  @Test
-  public void testPerformance() throws IOException {
-    File f = new File(
-        "/Users/wmw/eclipse-workspace/amazon-billing/CUR/607016221647.csv");
-
-    long start = System.currentTimeMillis();
-    List<Long> skipPoints =
-        LineReaderUtils.getSkipPoints(new FileReader(f), 50000);
-
-    System.out.println((System.currentTimeMillis() - start) / 1000);
-    System.out.println(skipPoints.size());
-
-    start = System.currentTimeMillis();
-    BufferedReader br = new BufferedReader(new FileReader(f));
-    br.skip(skipPoints.get(skipPoints.size() - 1));
-    System.out.println((System.currentTimeMillis() - start) / 1000);
-    br.close();
-
-    start = System.currentTimeMillis();
-    RandomAccessFile raf = new RandomAccessFile(f, "r");
-    raf.seek(skipPoints.get(skipPoints.size() - 1));
-    System.out.println((System.currentTimeMillis() - start) / 1000);
-    raf.close();
-
-    start = System.currentTimeMillis();
-    FileInputStream fis = new FileInputStream(f);
-    fis.getChannel().position(skipPoints.get(skipPoints.size() - 1));
-    System.out.println((System.currentTimeMillis() - start) / 1000);
-    fis.close();
   }
 
 }

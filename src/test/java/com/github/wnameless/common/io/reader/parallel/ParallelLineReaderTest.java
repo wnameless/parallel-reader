@@ -19,9 +19,11 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -31,6 +33,7 @@ import net.sf.rubycollect4j.Ruby;
 public class ParallelLineReaderTest {
 
   static ParallelLineReader plr;
+  static ParallelLineReader plrWithExec;
 
   @BeforeAll
   public static void setup() {
@@ -40,11 +43,42 @@ public class ParallelLineReaderTest {
       } catch (FileNotFoundException e) {}
       return null;
     });
+    plrWithExec = new ParallelLineReader(2, () -> {
+      try {
+        return new FileReader("src/test/resources/test.csv");
+      } catch (FileNotFoundException e) {}
+      return null;
+    }, Executors.newFixedThreadPool(4));
   }
 
   @Test
   public void testParallelRead()
-      throws InterruptedException, ExecutionException {
+      throws InterruptedException, ExecutionException, IOException {
+    List<CompletableFuture<String>> futures =
+        plrWithExec.parallelRead((part, lr) -> {
+          String str = "";
+
+          while (lr.hasNext()) {
+            str += lr.readLineQuietly();
+          }
+
+          lr.closeQuietly();
+          return str;
+        });
+
+    while (!Ruby.Array.of(futures).map(f -> f.isDone()).allʔ()) {}
+
+    String res = "";
+    for (CompletableFuture<String> cf : futures) {
+      res += cf.get();
+    }
+
+    assertEquals("1234567891011", res);
+  }
+
+  @Test
+  public void testParallelReadWithExecutor()
+      throws InterruptedException, ExecutionException, IOException {
     List<CompletableFuture<String>> futures = plr.parallelRead((part, lr) -> {
       String str = "";
 
