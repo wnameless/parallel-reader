@@ -18,8 +18,6 @@ Reading a big file line by line can be quite time consumption. It is often due t
 
 ## Quick Start
 
-Reads a content parallelly.
-<br>
 LineReaders with Reader:
 ```java
 // Reader must be provided by a Supplier
@@ -28,15 +26,15 @@ Supplier<Reader> readerSupplier = () -> new StringReader("1\n2\n3\n4\n5\n");
 int maxLines = 2;
 
 List<CompletableFuture<Integer>> futures =
-    LineReaders.readParallelly(readerSupplier, maxLines,
-        (part /* the index of each part starting from 0 */, lineReader) -> {
-          	while (lineReader.hasNext()) {
-            		String line = lineReader.readLineQuietly();
-            		System.out.println(line);
-            }
-
-            return part;
-        });
+	LineReaders.readParallelly(readerSupplier, maxLines,
+		(part /* the index of each part starting from 0 */, lineReader) -> {
+		while (lineReader.hasNext()) {
+			String line = lineReader.readLineQuietly();
+			System.out.println(line);
+		}
+		
+		return part;
+	});
 ```
 
 LineReaders with File:
@@ -48,13 +46,13 @@ int maxLines = 2;
 List<CompletableFuture<Integer>> futures =
 	LineReaders.readParallelly(file , maxLines,
 		(part /* the index of each part starting from 0 */, lineReader) -> {
-        		while (lineReader.hasNext()) {
-            		String line = lineReader.readLineQuietly();
-            		System.out.println(line);
-        		}
-
-        		return part;
-    		});
+		while (lineReader.hasNext()) {
+			String line = lineReader.readLineQuietly();
+			System.out.println(line);
+		}
+		
+		return part;
+	});
 ```
 
 LineReaders with Executor:
@@ -70,10 +68,10 @@ List<CompletableFuture<Integer>> futures =
 	LineReaders.readParallelly(file , maxLines,
 		(part /* the index of each part starting from 0 */, lineReader) -> {
         		while (lineReader.hasNext()) {
-            		String line = lineReader.readLineQuietly();
-            		System.out.println(line);
+            			String line = lineReader.readLineQuietly();
+            			System.out.println(line);
         		}
-
+			
         		return part;
     		}, executor);
 ```
