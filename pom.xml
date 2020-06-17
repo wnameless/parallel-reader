@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.wnameless.io</groupId>
 	<artifactId>parallel-reader</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1-SNAPSHOT</version>
 
 	<name>parallel-reader</name>
 	<description>A Java Reader can read lines from a file or a reader parallelly</description>
@@ -12,7 +12,7 @@
 		<connection>scm:git:git@github.com:wnameless/parallel-reader.git</connection>
 		<developerConnection>scm:git:git@github.com:wnameless/parallel-reader.git</developerConnection>
 		<url>git@github.com:wnameless/parallel-reader.git</url>
-		<tag>parallel-reader-1.0.0</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<distributionManagement>
