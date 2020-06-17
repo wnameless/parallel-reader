@@ -13,7 +13,7 @@
  * the License.
  *
  */
-package com.github.wnameless.common.io.reader.parallel;
+package com.github.wnameless.io.reader.parallel;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;

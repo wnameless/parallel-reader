@@ -13,7 +13,7 @@
  * the License.
  *
  */
-package com.github.wnameless.common.io.reader.parallel;
+package com.github.wnameless.io.reader.parallel;
 
 import static org.junit.Assert.assertEquals;
 
@@ -37,7 +37,7 @@ public class LineReaderUtilsTest {
 
   @Test
   public void testgGetSkipPoints() throws IOException {
-    List<Long> skipPoints = LineReaderUtils
+    List<Long> skipPoints = LineReaders
         .getSkipPoints(new FileReader("src/test/resources/test.csv"), 1);
 
     assertEquals(Arrays.asList(
@@ -56,7 +56,7 @@ public class LineReaderUtilsTest {
     };
 
     List<CompletableFuture<String>> futures =
-        LineReaderUtils.parallelLineReader(reader, 2, (part, lr) -> {
+        LineReaders.readParallelly(reader, 2, (part, lr) -> {
           String str = "";
 
           while (lr.hasNext()) {
@@ -87,7 +87,7 @@ public class LineReaderUtilsTest {
     };
 
     List<CompletableFuture<String>> futures =
-        LineReaderUtils.parallelLineReader(reader, 2, (part, lr) -> {
+        LineReaders.readParallelly(reader, 2, (part, lr) -> {
           String str = "";
 
           while (lr.hasNext()) {
@@ -110,17 +110,16 @@ public class LineReaderUtilsTest {
   @Test
   public void testParallelLineReaderWithFile()
       throws InterruptedException, ExecutionException, IOException {
-    List<CompletableFuture<String>> futures =
-        LineReaderUtils.parallelLineReader(
-            new File("src/test/resources/test.csv"), 2, (part, lr) -> {
-              String str = "";
+    List<CompletableFuture<String>> futures = LineReaders.readParallelly(
+        new File("src/test/resources/test.csv"), 2, (part, lr) -> {
+          String str = "";
 
-              while (lr.hasNext()) {
-                str += lr.readLineQuietly();
-              }
+          while (lr.hasNext()) {
+            str += lr.readLineQuietly();
+          }
 
-              return str;
-            });
+          return str;
+        });
 
     while (!Ruby.Array.of(futures).map(f -> f.isDone()).allʔ()) {}
 
@@ -135,17 +134,16 @@ public class LineReaderUtilsTest {
   @Test
   public void testParallelLineReaderWithFileAndExecutor()
       throws InterruptedException, ExecutionException, IOException {
-    List<CompletableFuture<String>> futures =
-        LineReaderUtils.parallelLineReader(
-            new File("src/test/resources/test.csv"), 2, (part, lr) -> {
-              String str = "";
+    List<CompletableFuture<String>> futures = LineReaders.readParallelly(
+        new File("src/test/resources/test.csv"), 2, (part, lr) -> {
+          String str = "";
 
-              while (lr.hasNext()) {
-                str += lr.readLineQuietly();
-              }
+          while (lr.hasNext()) {
+            str += lr.readLineQuietly();
+          }
 
-              return str;
-            }, Executors.newFixedThreadPool(4));
+          return str;
+        }, Executors.newFixedThreadPool(4));
 
     while (!Ruby.Array.of(futures).map(f -> f.isDone()).allʔ()) {}
 

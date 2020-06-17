@@ -13,7 +13,7 @@
  * the License.
  *
  */
-package com.github.wnameless.common.io.reader.parallel;
+package com.github.wnameless.io.reader.parallel;
 
 import static org.junit.Assert.assertEquals;
 
@@ -55,7 +55,7 @@ public class ParallelLineReaderTest {
   public void testParallelRead()
       throws InterruptedException, ExecutionException, IOException {
     List<CompletableFuture<String>> futures =
-        plrWithExec.parallelRead((part, lr) -> {
+        plrWithExec.readParallelly((part, lr) -> {
           String str = "";
 
           while (lr.hasNext()) {
@@ -79,7 +79,7 @@ public class ParallelLineReaderTest {
   @Test
   public void testParallelReadWithExecutor()
       throws InterruptedException, ExecutionException, IOException {
-    List<CompletableFuture<String>> futures = plr.parallelRead((part, lr) -> {
+    List<CompletableFuture<String>> futures = plr.readParallelly((part, lr) -> {
       String str = "";
 
       while (lr.hasNext()) {

@@ -13,10 +13,23 @@
  * the License.
  *
  */
-package com.github.wnameless.common.io.reader.parallel;
+package com.github.wnameless.io.reader.parallel;
 
 import java.util.function.BiFunction;
 
+/**
+ * 
+ * {@link LineReaderFunction} is used by {@link ParallelLineReader}. The first
+ * input parameter is an integer which represents the number of parts in a
+ * divided content. The input parameter is a {@link LineReader} which read all
+ * lines in a divided content.
+ * 
+ * @author Wei-Ming Wu
+ *
+ * @param <E>
+ *          the type of returning value
+ * 
+ */
 @FunctionalInterface
 public interface LineReaderFunction<E>
     extends BiFunction<Integer, LineReader, E> {}

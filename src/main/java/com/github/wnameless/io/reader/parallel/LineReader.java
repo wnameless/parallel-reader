@@ -13,7 +13,7 @@
  * the License.
  *
  */
-package com.github.wnameless.common.io.reader.parallel;
+package com.github.wnameless.io.reader.parallel;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -25,7 +25,8 @@ import java.io.Reader;
 
 /**
  * 
- * {@link LineReader}
+ * {@link LineReader} reads lines from any {@link Reader} or {@link File} with a
+ * limitation which is described by given parameters.
  * 
  * @author Wei-Ming Wu
  *
@@ -36,9 +37,18 @@ public class LineReader implements Closeable {
   private final int maxLines;
 
   private int currentLine = 0;
-
   private String peek;
 
+  /**
+   * Creates a {@link LineReader} by given {@link File}.
+   * 
+   * @param file
+   *          which contains lines
+   * @param position
+   *          bytes to be skipped
+   * @param maxLines
+   *          the max number of lines to read
+   */
   public LineReader(File file, long position, int maxLines) {
     FileInputStream fis;
     try {
@@ -57,6 +67,16 @@ public class LineReader implements Closeable {
     }
   }
 
+  /**
+   * Creates a {@link LineReader} by given {@link Reader}.
+   * 
+   * @param reader
+   *          which contains lines
+   * @param skip
+   *          characters to be skipped
+   * @param maxLines
+   *          the max number of lines to read
+   */
   public LineReader(Reader reader, long skip, int maxLines) {
     br = new BufferedReader(reader);
     this.maxLines = maxLines;
@@ -68,10 +88,22 @@ public class LineReader implements Closeable {
     }
   }
 
+  /**
+   * Returns true if there is a next line existed.
+   * 
+   * @return true if there is a next line to be read, false otherwise
+   */
   public boolean hasNext() {
     return peek != null;
   }
 
+  /**
+   * Reads a line from either a {@link File} or a {@link Reader}.
+   * 
+   * @return a String contains the content of a line
+   * @throws IOException
+   *           if an I/O Exception happened during reading
+   */
   public String readLine() throws IOException {
     String line = peek;
 
@@ -90,6 +122,11 @@ public class LineReader implements Closeable {
     return null;
   }
 
+  /**
+   * Reads a line and turns any exception into a {@link RuntimeException}.
+   * 
+   * @return a String contains the content of a line
+   */
   public String readLineQuietly() {
     String line = null;
     try {
@@ -105,6 +142,9 @@ public class LineReader implements Closeable {
     br.close();
   }
 
+  /**
+   * Closes this reader and suppresses any exception.
+   */
   public void closeQuietly() {
     try {
       br.close();
